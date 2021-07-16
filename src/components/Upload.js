@@ -1,37 +1,51 @@
 import { Button } from '@chakra-ui/button';
-import { Box, Container } from '@chakra-ui/layout';
-import handleFileSelection from '../helpers/readFile';
+import { Box } from '@chakra-ui/layout';
+import { useContext, useEffect, useState } from 'react';
+import { MyContext } from '../App';
 
-const Upload = () => {
-  const uploadHandler = () => {
+import handleFileSelection, { STATUS, parseTextAsXml } from '../utils';
+
+const Upload = ({ setStatus }) => {
+  const { dispatch } = useContext(MyContext);
+  const [inputVal, setInputVal] = useState('');
+  const [file, setFile] = useState();
+
+  useEffect(() => {
+    if (file) {
+      setStatus(STATUS.PENDING);
+      handleFileSelection(file, (xmlText) => {
+        const xmlDom = parseTextAsXml(xmlText);
+        dispatch({ type: 'set_xml', payload: xmlDom });
+        dispatch({ type: 'set_xmlText', payload: xmlText });
+      });
+      dispatch({ type: 'set_fileName', payload: file.name });
+      setInputVal('');
+      setStatus(STATUS.RESOLVED);
+    }
+  }, [file, dispatch, setStatus]);
+  const uploadInit = () => {
     document.getElementById('uploadFile').click();
   };
+  const uploadHandler = (event) => {
+    setInputVal(event.target.value);
+    setFile(event.target.files[0]);
+  };
+
   return (
-    <Container
-      mt={5}
-      display='flex'
-      flexDirection='row'
-      justifyContent='center'
-    >
+    <>
       <input
         type='file'
         id='uploadFile'
         style={{ display: 'none' }}
-        onChange={(event) => {
-          handleFileSelection(event.target);
-        }}
+        onChange={uploadHandler}
+        value={inputVal}
       />
       <Box mr={2} ml={2}>
-        <Button colorScheme='blue' onClick={uploadHandler}>
+        <Button colorScheme='blue' onClick={uploadInit}>
           Upload
         </Button>
       </Box>
-      <Box mr={2} ml={2}>
-        <Button colorScheme='pink' onClick={uploadHandler}>
-          Generate File
-        </Button>
-      </Box>
-    </Container>
+    </>
   );
 };
 
