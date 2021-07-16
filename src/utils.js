@@ -38,7 +38,7 @@ function handleFileSelection(file, callback) {
 function waitForTextReadComplete(reader, callback) {
   reader.onloadend = function (event) {
     var text = event.target.result;
-    var xmlDom = parseTextAsXml(text);
+    parseTextAsXml(text);
     callback(text);
   };
 }
