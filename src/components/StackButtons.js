@@ -3,6 +3,7 @@ import { Spinner } from '@chakra-ui/spinner';
 import { STATUS } from '../utils';
 import OptionButton from './OptionButton';
 import { WrapItem } from '@chakra-ui/react';
+import { useEffect } from 'react';
 
 const StackButtons = ({ xmlUpdate, status, dispatch, toggleModalOpen }) => {
   if (status === STATUS.IDLE) {

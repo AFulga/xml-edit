@@ -69,6 +69,20 @@ export const generateOE = (eid, nameQ, text) => {
   return $oe;
 };
 
+export const generateCondition = (eid) => {
+  const xmlString = `<Condition ElseEnabled="false" EntityId="${eid}" PerformDelete="true" ReadOnly="false">
+                        <Expression>false</Expression>
+                        <TrueNodes EntityId="${eid}_TrueNodes"></TrueNodes>
+                        <FalseNodes EntityId="${eid}_FalseNodes" />
+                    </Condition>`;
+  const parser = new DOMParser();
+  const $cond = parser
+    .parseFromString(xmlString, 'text/xml')
+    .querySelector('*');
+
+  return $cond;
+};
+
 export const generateNUM = (eid, nameQ, text, customAttr) => {
   const xmlString = `<Open EntityId="${eid}" NotRequired="true" QuestionCategory="" ${customAttr} DefaultValue="" NotPerformDataCleaningOnMasking="true" Rows="1" Numeric="true" LowerLimitType="GreaterOrEqual" UpperLimitType="SmallerOrEqual">
                       <Name>${nameQ}</Name>

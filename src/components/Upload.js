@@ -6,7 +6,7 @@ import { MyContext } from '../App';
 import handleFileSelection, { STATUS, parseTextAsXml } from '../utils';
 
 const Upload = ({ setStatus }) => {
-  const { dispatch } = useContext(MyContext);
+  const { state, dispatch } = useContext(MyContext);
   const [inputVal, setInputVal] = useState('');
   const [file, setFile] = useState();
 
@@ -17,8 +17,10 @@ const Upload = ({ setStatus }) => {
         const xmlDom = parseTextAsXml(xmlText);
         dispatch({ type: 'set_xml', payload: xmlDom });
         dispatch({ type: 'set_xmlText', payload: xmlText });
+        dispatch({ type: 'set_toKeep' });
       });
       dispatch({ type: 'set_fileName', payload: file.name });
+
       setInputVal('');
       setStatus(STATUS.RESOLVED);
     }
@@ -41,7 +43,12 @@ const Upload = ({ setStatus }) => {
         value={inputVal}
       />
       <Box mr={2} ml={2}>
-        <Button colorScheme='blue' onClick={uploadInit}>
+        <Button
+          css={{ backgroundColor: 'rgb(201, 27, 31)', color: '#ffffff' }}
+          colorScheme='blue'
+          onClick={uploadInit}
+          _hover={{ backgroundColor: 'rgb(181, 24, 26)' }}
+        >
           Upload
         </Button>
       </Box>

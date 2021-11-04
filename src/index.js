@@ -4,10 +4,14 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
-
-const theme = extendTheme({
+import { Helmet } from 'react-helmet';
+const config = {
   initialColorMode: 'dark',
   useSystemColorMode: false,
+};
+
+const theme = extendTheme({
+  config,
   colors: {
     red: {
       300: '#FC8181',
@@ -17,6 +21,9 @@ const theme = extendTheme({
 
 ReactDOM.render(
   <React.StrictMode>
+    <Helmet>
+      <title>DataEntry Creation</title>
+    </Helmet>
     <ChakraProvider theme={theme}>
       <App />
     </ChakraProvider>

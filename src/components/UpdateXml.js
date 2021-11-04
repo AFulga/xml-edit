@@ -31,7 +31,13 @@ const UpdateXml = ({ isDisabled }) => {
 
   return (
     <Box mr={2} ml={2}>
-      <Button colorScheme='pink' onClick={handleClick} disabled={!isDisabled}>
+      <Button
+        onClick={handleClick}
+        disabled={!isDisabled}
+        colorScheme='linkedin'
+        css={{ backgroundColor: '#4baac5', color: '#ffffff' }}
+        _hover={{ backgroundColor: '#6ec6df' }}
+      >
         Generate File
       </Button>
     </Box>

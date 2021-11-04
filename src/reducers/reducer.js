@@ -4,6 +4,7 @@ import {
   generateNUM,
   precodeMask,
   loopMask,
+  generateCondition,
 } from '../utils';
 
 export const reducer = (state, action) => {
@@ -47,7 +48,11 @@ export const reducer = (state, action) => {
 
       const filterTags = tagsSelected.filter((tag) => {
         const eid = tag.parentNode.getAttribute('EntityId');
-        return !toKeep.includes(+eid) && !extraToKeep.includes(+eid);
+        const uniqueIndentifier = `${tag.parentNode.tagName}_${eid}`;
+        return (
+          !toKeep.includes(uniqueIndentifier) &&
+          !extraToKeep.includes(uniqueIndentifier)
+        );
       });
       filterTags.forEach((tag) => {
         tag.innerHTML = '';
@@ -62,6 +67,8 @@ export const reducer = (state, action) => {
       tagsSelected.forEach((tag) => {
         const varType = tag.parentNode.getAttribute('VariableType');
         const eid = tag.parentNode.getAttribute('EntityId');
+        const tagName = tag.parentNode.tagName;
+        const uniqueIndentifier = `${tagName}_${eid}`;
         let isNotInQf = true;
         const closestIf = tag.closest('Condition');
         if (closestIf) {
@@ -73,26 +80,54 @@ export const reducer = (state, action) => {
         }
         if (
           varType !== 'Hidden' &&
-          !notEmpty.includes(+eid) &&
+          !notEmpty.includes(uniqueIndentifier) &&
           tag.innerHTML !== '' &&
           isNotInQf
         ) {
-          notEmpty.push(+eid);
+          notEmpty.push(uniqueIndentifier);
         }
       });
       return { ...state };
     }
+
     case 'set_toKeep': {
+      console.log('state.xmlDOM', state.xmlDom);
+      state.xmlUpdate.map((group) => {
+        console.log('group', group);
+        const { tagsToUpdate, toKeep } = group;
+        if (!tagsToUpdate) {
+          return;
+        }
+        const tagsSelected = Array.from(
+          state.xmlDom.querySelectorAll(tagsToUpdate.toString())
+        );
+        tagsSelected.forEach((tag) => {
+          const varType = tag.parentNode.getAttribute('VariableType');
+          const eid = tag.parentNode.getAttribute('EntityId');
+          const tagName = tag.parentNode.tagName;
+          const uniqueIndentifier = `${tagName}_${eid}`;
+          const html = tag.innerHTML.trim();
+
+          if (html.indexOf('false') === 0 && varType !== 'Hidden') {
+            toKeep.push(uniqueIndentifier);
+          }
+        });
+      });
+      return { ...state };
+    }
+
+    case 'toggle_set_toKeep': {
       let tempArr = selectedGroup.toKeep.slice();
-      const { eid, shouldAdd } = payload;
+      const { uniqueIndentifier, shouldAdd } = payload;
+
       if (shouldAdd) {
-        if (!tempArr.includes(eid)) {
-          tempArr.push(eid);
+        if (!tempArr.includes(uniqueIndentifier)) {
+          tempArr.push(uniqueIndentifier);
         }
       } else {
-        const index = tempArr.indexOf(eid);
+        const index = tempArr.indexOf(uniqueIndentifier);
         if (index >= 0) {
-          tempArr = tempArr.filter((el) => el !== eid);
+          tempArr = tempArr.filter((el) => el !== uniqueIndentifier);
         }
       }
       return {
@@ -183,11 +218,24 @@ export const reducer = (state, action) => {
       return { ...state };
     }
     case 'remove_french_demographic_questions': {
-      state.xmlDom.querySelectorAll('Page > Name').forEach((page) => {
-        if (page.innerHTML) {
-          const text = page.innerHTML.trim();
+      state.xmlDom.querySelectorAll('Page > Name').forEach((pageName) => {
+        if (pageName.innerHTML) {
+          const page = pageName.closest('Page');
+          const text = pageName.innerHTML.trim();
+
           if (text.indexOf('EndPageFrench') === 0) {
-            const expr = page.closest('Condition').querySelector('Expression');
+            let conditionNode = page.closest('Condition');
+
+            if (!conditionNode) {
+              let lastEid = null;
+              const eid = generateEntityId(state.xmlDom, lastEid);
+              const conditionXml = generateCondition(eid);
+              page.parentNode.insertBefore(conditionXml, page);
+              conditionNode = state.xmlDom.querySelector(`[EntityId="${eid}"]`);
+              conditionNode.querySelector('TrueNodes').appendChild(page);
+            }
+
+            const expr = conditionNode.querySelector('Expression');
             const newText = expr.innerHTML.trim();
             if (newText.indexOf('false') !== 0) {
               expr.innerHTML = `false // ${newText}`;
@@ -301,7 +349,7 @@ export const reducer = (state, action) => {
         if (attrVal.indexOf('DATA ENTRY') === -1) {
           $tag.setAttribute(
             attrToChange,
-            `${attrVal.split(' *')[0]} **DATA ENTRY**`
+            `${attrVal.split(' *')[0]} **DATA ENTRY** TEST`
           );
         }
       });

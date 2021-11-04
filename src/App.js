@@ -1,5 +1,5 @@
 import './App.css';
-import { Box, Container } from '@chakra-ui/react';
+import { Box, Container, Text } from '@chakra-ui/react';
 import Header from './components/Header';
 import Upload from './components/Upload';
 import React, { useReducer, useState } from 'react';
@@ -26,6 +26,11 @@ function App() {
       <MyContext.Provider value={{ state, dispatch }}>
         <Box>
           <Header />
+          <Container mt={5} mb={5}>
+            <Text css={{ fontSize: '25px', fontWeight: 'bold' }}>
+              Welcome to DataEntry Wizard
+            </Text>
+          </Container>
           <Container
             mt={5}
             mb={10}
