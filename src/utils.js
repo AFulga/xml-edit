@@ -111,6 +111,9 @@ export const loopMask = (qid) => {
 };
 
 export const generateEntityId = (xmlDom, start, qTitle) => {
+  if (doesQuestionExists(xmlDom, qTitle)) {
+    return null;
+  }
   let eid = 1700;
   if (start) {
     eid = start + 1;
@@ -119,15 +122,24 @@ export const generateEntityId = (xmlDom, start, qTitle) => {
 
   do {
     node = xmlDom.querySelector(`[EntityId="${eid}"]`);
-    eid += 50;
+    if (node) {
+      eid += 50;
+    }
   } while (node);
   return eid;
 };
 
-export const doesQuestionExists = (node, qTitle) => {
-  if (node && node.querySelector('Name').innerHTML === qTitle) {
-    return true;
-  }
-  return false;
+export const doesQuestionExists = (xmlDom, qTitle) => {
+  let questionExist = false;
+  Array.from(xmlDom.querySelectorAll('Name')).forEach((element) => {
+    if (element.innerHTML === qTitle) {
+      questionExist = true;
+    }
+  });
+  // if (node && node.querySelector('Name').innerHTML === qTitle) {
+  //   return true;
+  // }
+  // return false;
+  return questionExist;
 };
 export default handleFileSelection;

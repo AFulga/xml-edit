@@ -91,9 +91,7 @@ export const reducer = (state, action) => {
     }
 
     case 'set_toKeep': {
-      console.log('state.xmlDOM', state.xmlDom);
       state.xmlUpdate.map((group) => {
-        console.log('group', group);
         const { tagsToUpdate, toKeep } = group;
         if (!tagsToUpdate) {
           return;
@@ -284,20 +282,29 @@ export const reducer = (state, action) => {
 
           nodePoints.forEach((nodePoint, index) => {
             let parentNode = nodePoint.parentNode;
-            eid = generateEntityId(state.xmlDom, lastEid, question.title);
-            if (keepValidation) {
-              validationGroup.extraToKeep.push(eid);
-            }
-            lastEid = eid;
+
             const qTitle = index
               ? question.title + (index + 1)
               : question.title;
+
+            eid = generateEntityId(state.xmlDom, lastEid, qTitle);
+            lastEid = eid;
+
+            // if (!eid) {
+            //   return;
+            // }
             const questionXml = question.questionGenerate(
               eid,
               qTitle,
               question.text,
               question.customAttr
             );
+
+            const tagName = questionXml.tagName;
+            const uniqueIndentifier = `${tagName}_${eid}`;
+            if (keepValidation) {
+              validationGroup.extraToKeep.push(uniqueIndentifier);
+            }
 
             if (where.place === 'after') {
               nodePoint = nodePoint.nextSibling;
@@ -310,6 +317,7 @@ export const reducer = (state, action) => {
                 if ($lpMask[0]) {
                   const mask = loopMask(qTitle);
                   $lpMask[0].innerHTML = mask;
+                  // console.log('mask', mask, $lpMask[0]);
                 } else {
                   const $maskXml = precodeMask(qTitle);
                   nodePoint.appendChild($maskXml);
@@ -319,10 +327,14 @@ export const reducer = (state, action) => {
               if (where.place === 'prepand' || where.place === 'append') {
                 parentNode = nodePoint.querySelector('Nodes');
               }
+              // console.log('nodePoint', nodePoint);
             }
 
             if (where.place === 'prepand') {
               nodePoint = parentNode.children[0];
+            }
+            if (!eid) {
+              return;
             }
 
             const node = state.xmlDom.querySelector(`[EntityId="${eid}"]`);

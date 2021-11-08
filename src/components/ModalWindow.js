@@ -27,10 +27,6 @@ function ModalWindow({ isModalOpen, toggleOpen, modalData }) {
   const modalGroup = state.xmlUpdate.find((el) => el.group === modalData);
   const { group, toKeep, notEmpty, tagsToUpdate } = modalGroup;
 
-  console.log('modalData:', modalData);
-  console.log('modalGroup:', modalGroup);
-  console.log('notEmpty:', notEmpty);
-
   const handleClick = (uniqueIndentifier, shouldAdd) => {
     dispatch({
       type: 'toggle_set_toKeep',
