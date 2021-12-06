@@ -49,7 +49,7 @@ export const parseTextAsXml = (text) => {
   return xmlDom;
 };
 
-export const generateOE = (eid, nameQ, text) => {
+export const generateOE = (eid, nameQ, text, keepValidation) => {
   const xmlString = `<Open EntityId="${eid}" NotPerformDataCleaningOnMasking="true">
                           <Name>${nameQ}</Name>
                           <FormTexts>
@@ -61,7 +61,11 @@ export const generateOE = (eid, nameQ, text) => {
                           </FormTexts>
                           <TranslationStatuses />
                           <QuestionTriggers />
-                          <ValidationCode>if ( !f(CurrentForm()).toBoolean() ) { RaiseError(); SetQuestionErrorMessage(LangIDs.fr,"Veuillez fournir une r&#233;ponse.");}</ValidationCode>
+                          ${
+                            keepValidation
+                              ? '<ValidationCode>if ( !f(CurrentForm()).toBoolean() ) { RaiseError(); SetQuestionErrorMessage(LangIDs.fr,"Veuillez fournir une r&#233;ponse.");}</ValidationCode>'
+                              : '<ValidationCode />'
+                          }
                         </Open>`;
   const parser = new DOMParser();
   const $oe = parser.parseFromString(xmlString, 'text/xml').querySelector('*');

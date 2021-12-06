@@ -297,7 +297,8 @@ export const reducer = (state, action) => {
               eid,
               qTitle,
               question.text,
-              question.customAttr
+              question.customAttr,
+              question.keepValidation
             );
 
             const tagName = questionXml.tagName;
@@ -401,7 +402,7 @@ export const initialState = {
     {
       group: 'maskings',
       title: 'Remove all Maskings',
-      shouldUpdate: true,
+      shouldUpdate: false,
       type: 'clean_tag',
       toKeep: [],
       extraToKeep: [],
